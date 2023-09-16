@@ -1,3 +1,5 @@
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_ui/Screens/signup.dart';
 import 'package:responsive_ui/widgets/custom_password_form_filed.dart';
@@ -17,6 +19,7 @@ class LogInScreen extends StatefulWidget {
 class _LogInScreenState extends State<LogInScreen> {
   // create global key for form state
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late String email, password;
 
   @override
   Widget build(BuildContext context) {
@@ -41,27 +44,23 @@ class _LogInScreenState extends State<LogInScreen> {
               const SizedBox(
                 height: 50,
               ),
-              const CustomTextFormFiled(
+              CustomTextFormFiled(
+                onChange: (p0) => email = p0!,
                 hintText: 'username',
-                prefixIcon: Icon(Icons.person),
+                prefixIcon: const Icon(Icons.person),
               ),
               const SizedBox(
                 height: 20,
               ),
-              const CustomPasswordFiled(hintText: 'password'),
+              CustomPasswordFiled(
+                hintText: 'password',
+                onChanged: (p0) => password = p0,
+              ),
               const SizedBox(
                 height: 50,
               ),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return HomeScreen(
-                        name: widget._userName.text,
-                      );
-                    },
-                  ));
-                },
+                onTap: _loginFunction,
                 child: Container(
                   width: 350,
                   height: 65,
@@ -111,5 +110,27 @@ class _LogInScreenState extends State<LogInScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _loginFunction() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        final credential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomeScreen()));
+      } on FirebaseAuthException catch (e) {
+        _handleFirebaseExceptions(e);
+      }
+    }
+  }
+
+  void _handleFirebaseExceptions(FirebaseAuthException e) {
+    if (e.code == 'user-not-found') {
+      debugPrint('No user found for that email.');
+      
+    } else if (e.code == 'wrong-password') {
+      debugPrint('Wrong password provided for that user.');
+      
+    }
   }
 }

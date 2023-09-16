@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomPasswordFiled extends StatefulWidget {
-  const CustomPasswordFiled({super.key, required this.hintText});
+  const CustomPasswordFiled({super.key, required this.hintText, this.onChanged});
   final String hintText;
+  final Function(String)? onChanged;
 
   @override
   State<CustomPasswordFiled> createState() => _CustomPasswordFiledState();
@@ -20,6 +21,7 @@ class _CustomPasswordFiledState extends State<CustomPasswordFiled> {
           return null;
         }
       },
+      onChanged: widget.onChanged,
       obscureText: _obscureText,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.password),

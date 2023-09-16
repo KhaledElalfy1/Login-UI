@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:responsive_ui/Screens/home.dart';
 
 import 'Screens/Login.dart';
 
@@ -13,14 +15,32 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    FirebaseAuth.instance
+  .authStateChanges()
+  .listen((User? user) {
+    if (user == null) {
+      debugPrint('User is currently signed out!');
+    } else {
+      debugPrint('User is signed in!');
+    }
+  });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LogInScreen(),
+      home:FirebaseAuth.instance.currentUser==null? LogInScreen():const HomeScreen(),
     );
   }
 }
