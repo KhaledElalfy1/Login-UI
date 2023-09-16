@@ -1,4 +1,4 @@
-
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_ui/Screens/signup.dart';
@@ -8,9 +8,7 @@ import 'package:responsive_ui/widgets/custom_text_form_filed.dart';
 import 'home.dart';
 
 class LogInScreen extends StatefulWidget {
-  final TextEditingController _userName = TextEditingController();
-
-  LogInScreen({Key? key}) : super(key: key);
+  const LogInScreen({Key? key}) : super(key: key);
 
   @override
   State<LogInScreen> createState() => _LogInScreenState();
@@ -102,9 +100,58 @@ class _LogInScreenState extends State<LogInScreen> {
                       'Signup',
                       style: TextStyle(color: Colors.blue),
                     ),
-                  )
+                  ),
                 ],
-              )
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const Row(
+                children: [
+                  Expanded(
+                    child: Divider(color: Colors.grey, thickness: 2),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text('or'),
+                  ),
+                  Expanded(
+                    child: Divider(color: Colors.grey, thickness: 2),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              // create container to sign in with google
+              GestureDetector(
+                onTap: () {},
+                child: Container(
+                  width: 350,
+                  height: 65,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: Color(0xff395BA9)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/google.png',
+                        width: 30,
+                        height: 30,
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      const Text(
+                        'Sign in with google',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -117,7 +164,27 @@ class _LogInScreenState extends State<LogInScreen> {
       try {
         final credential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomeScreen()));
+        if (credential.user!.emailVerified) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const HomeScreen();
+              },
+            ),
+          );
+        } else {
+          credential.user!.sendEmailVerification();
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            animType: AnimType.rightSlide,
+            title: 'Dialog Title',
+            desc: 'Kindly verify your email',
+            btnCancelOnPress: () {},
+            btnOkOnPress: () {},
+          ).show();
+        }
       } on FirebaseAuthException catch (e) {
         _handleFirebaseExceptions(e);
       }
@@ -126,11 +193,27 @@ class _LogInScreenState extends State<LogInScreen> {
 
   void _handleFirebaseExceptions(FirebaseAuthException e) {
     if (e.code == 'user-not-found') {
-      debugPrint('No user found for that email.');
-      
+      // debugPrint('No user found for that email.');
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.rightSlide,
+        title: 'Dialog Title',
+        desc: 'No user found for that email',
+        btnCancelOnPress: () {},
+        btnOkOnPress: () {},
+      ).show();
     } else if (e.code == 'wrong-password') {
-      debugPrint('Wrong password provided for that user.');
-      
+      // debugPrint('Wrong password provided for that user.');
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.rightSlide,
+        title: 'Dialog Title',
+        desc: 'Wrong password provided for that user',
+        btnCancelOnPress: () {},
+        btnOkOnPress: () {},
+      ).show();
     }
   }
 }

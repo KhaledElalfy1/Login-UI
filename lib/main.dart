@@ -25,22 +25,24 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    FirebaseAuth.instance
-  .authStateChanges()
-  .listen((User? user) {
-    if (user == null) {
-      debugPrint('User is currently signed out!');
-    } else {
-      debugPrint('User is signed in!');
-    }
-  });
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        debugPrint('User is currently signed out!');
+      } else {
+        debugPrint('User is signed in!');
+      }
+    });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:FirebaseAuth.instance.currentUser==null? LogInScreen():const HomeScreen(),
+      home: (FirebaseAuth.instance.currentUser != null &&
+              FirebaseAuth.instance.currentUser!.emailVerified)
+          ? const HomeScreen()
+          : const LogInScreen(),
     );
   }
 }
