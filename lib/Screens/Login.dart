@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_ui/Screens/signup.dart';
+import 'package:responsive_ui/services/google_auth.dart';
 import 'package:responsive_ui/widgets/custom_password_form_filed.dart';
 import 'package:responsive_ui/widgets/custom_text_form_filed.dart';
 
@@ -125,7 +126,18 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
               // create container to sign in with google
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  AuthServices().signInWithGoogle().then((value) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const HomeScreen();
+                        },
+                      ),
+                    );
+                  }); 
+                },
                 child: Container(
                   width: 350,
                   height: 65,
@@ -158,6 +170,8 @@ class _LogInScreenState extends State<LogInScreen> {
       ),
     );
   }
+
+  
 
   Future<void> _loginFunction() async {
     if (_formKey.currentState!.validate()) {
