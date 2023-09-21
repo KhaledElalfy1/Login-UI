@@ -18,7 +18,14 @@ class LogInScreen extends StatefulWidget {
 class _LogInScreenState extends State<LogInScreen> {
   // create global key for form state
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String email, password;
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +51,8 @@ class _LogInScreenState extends State<LogInScreen> {
                 height: 50,
               ),
               CustomTextFormFiled(
-                onChange: (p0) => email = p0!,
+                controller: email,
+                onChange: (p0) => email.text = p0,
                 hintText: 'username',
                 prefixIcon: const Icon(Icons.person),
               ),
@@ -52,21 +60,68 @@ class _LogInScreenState extends State<LogInScreen> {
                 height: 20,
               ),
               CustomPasswordFiled(
+                controller: password,
                 hintText: 'password',
-                onChanged: (p0) => password = p0,
+                onChanged: (p0) => password.text = p0,
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () async {
+                    if (email.text == "") {
+                      AwesomeDialog(
+                        context: context,
+                        dialogType: DialogType.error,
+                        animType: AnimType.rightSlide,
+                        title: 'Dialog Title',
+                        desc: 'Kindly enter your email',
+                        btnCancelOnPress: () {},
+                        btnOkOnPress: () {},
+                      ).show();
+                      return;
+                    }
+                    try {
+                      await FirebaseAuth.instance
+                          .sendPasswordResetEmail(email: email.text);
+                      AwesomeDialog(
+                        context: context,
+                        dialogType: DialogType.info,
+                        animType: AnimType.rightSlide,
+                        title: 'Dialog Title',
+                        desc: 'Kindly check your email',
+                        btnCancelOnPress: () {},
+                        btnOkOnPress: () {},
+                      ).show();
+                    } on Exception catch (e) {
+                      AwesomeDialog(
+                        context: context,
+                        dialogType: DialogType.error,
+                        animType: AnimType.rightSlide,
+                        title: 'Dialog Title',
+                        desc: 'enter valid email',
+                        btnCancelOnPress: () {},
+                        btnOkOnPress: () {},
+                      ).show();
+                    }
+                  },
+                  child: const Text('Forgot password?'),
+                ),
               ),
               const SizedBox(
-                height: 50,
+                height: 40,
               ),
-              GestureDetector(
+              InkWell(
                 onTap: _loginFunction,
                 child: Container(
                   width: 350,
                   height: 65,
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Color(0xff395BA9)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(20),
+                    ),
+                    color: Color(0xff395BA9),
+                  ),
                   child: const Text(
                     'login',
                     style: TextStyle(color: Colors.white, fontSize: 20),
@@ -136,7 +191,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         },
                       ),
                     );
-                  }); 
+                  });
                 },
                 child: Container(
                   width: 350,
@@ -171,13 +226,12 @@ class _LogInScreenState extends State<LogInScreen> {
     );
   }
 
-  
-
   Future<void> _loginFunction() async {
     if (_formKey.currentState!.validate()) {
       try {
         final credential = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: email, password: password);
+            .signInWithEmailAndPassword(
+                email: email.text, password: password.text);
         if (credential.user!.emailVerified) {
           Navigator.push(
             context,

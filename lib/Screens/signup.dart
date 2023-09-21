@@ -15,7 +15,21 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String email, password;
+ 
+  // create five text editing controller for user name, email, password, confirm password and phone number and dispose it
+  TextEditingController username = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController confirmPassword = TextEditingController();
+  @override
+  void dispose() {
+    username.dispose();
+    email.dispose();
+    password.dispose();
+    confirmPassword.dispose();
+
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,15 +53,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(
                 height: 50,
               ),
-              const CustomTextFormFiled(
+               CustomTextFormFiled(
+                controller: username,
                 hintText: 'username',
-                prefixIcon: Icon(Icons.person),
+                prefixIcon: const Icon(Icons.person),
               ),
               const SizedBox(
                 height: 10,
               ),
               CustomTextFormFiled(
-                onChange: (p0) => email = p0!,
+                controller: email,
+                onChange: (p0) => email.text = p0,
                 hintText: 'Email',
                 prefixIcon: const Icon(Icons.email_outlined),
               ),
@@ -55,13 +71,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 height: 10,
               ),
               CustomPasswordFiled(
-                onChanged: (p0) => password = p0,
+                controller: password,
+                onChanged: (p0) => password.text = p0,
                 hintText: 'password',
               ),
               const SizedBox(
                 height: 10,
               ),
-              const CustomPasswordFiled(hintText: 'confirm password'),
+               CustomPasswordFiled(
+                  controller: confirmPassword,
+                hintText: 'confirm password'),
               const SizedBox(
                 height: 50,
               ),
@@ -123,8 +142,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       try {
         final credential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
+          email: email.text,
+          password: password.text,
         );
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {

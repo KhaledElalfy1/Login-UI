@@ -1,6 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:responsive_ui/Screens/Login.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -20,6 +21,7 @@ class HomeScreen extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () async {
+                GoogleSignIn().signOut();
                 await FirebaseAuth.instance.signOut();
                 Navigator.push(context, MaterialPageRoute(
                   builder: (context) {
@@ -30,38 +32,38 @@ class HomeScreen extends StatelessWidget {
               icon: const Icon(Icons.arrow_forward))
         ],
       ),
-      body: Column(
+      body: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Center(
+          Center(
             child: Text(
               'Welcome name 🎉',
               style: TextStyle(fontSize: 25),
             ),
           ),
-          const Center(
+          Center(
             child: Text(
               'Flutter',
               style: TextStyle(color: Color(0xff1A294D), fontSize: 70),
             ),
           ),
-          FirebaseAuth.instance.currentUser!.emailVerified
-              ? const Text('Verified')
-              : MaterialButton(
-                  color: Colors.white,
-                  onPressed: () {
-                    try {
-                      FirebaseAuth.instance.currentUser!
-                          .sendEmailVerification();
-                      showDialog(context, 'email is sended').show();
-                    } on Exception catch (_) {
-                      showDialog(
-                              context, 'Error while sending email verification')
-                          .show();
-                    }
-                  },
-                  child: const Text('Please Verify your email'),
-                ),
+          // FirebaseAuth.instance.currentUser!.emailVerified
+          //     ? const Text('Verified')
+          //     : MaterialButton(
+          //         color: Colors.white,
+          //         onPressed: () {
+          //           try {
+          //             FirebaseAuth.instance.currentUser!
+          //                 .sendEmailVerification();
+          //             showDialog(context, 'email is sended').show();
+          //           } on Exception catch (_) {
+          //             showDialog(
+          //                     context, 'Error while sending email verification')
+          //                 .show();
+          //           }
+          //         },
+          //         child: const Text('Please Verify your email'),
+          //       ),
         ],
       ),
     );

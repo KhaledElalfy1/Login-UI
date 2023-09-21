@@ -5,10 +5,11 @@ class CustomTextFormFiled extends StatelessWidget {
       {super.key,
       required this.hintText,
       required this.prefixIcon,
-      this.onChange});
+      this.onChange, required this.controller,});
   final String hintText;
   final Icon prefixIcon;
-  final Function(String?)? onChange;
+  final Function(String)? onChange;
+  final TextEditingController controller;
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -19,6 +20,7 @@ class CustomTextFormFiled extends StatelessWidget {
           return null;
         }
       },
+      controller: controller,
       onChanged: onChange,
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
